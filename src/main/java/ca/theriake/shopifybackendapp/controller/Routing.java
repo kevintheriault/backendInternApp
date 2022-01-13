@@ -1,6 +1,8 @@
 package ca.theriake.shopifybackendapp.controller;
 
+import ca.theriake.shopifybackendapp.models.Comment;
 import ca.theriake.shopifybackendapp.models.Item;
+import ca.theriake.shopifybackendapp.repository.CommentRepo;
 import ca.theriake.shopifybackendapp.repository.ItemRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,12 +14,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 @Controller
 public class Routing {
 //    Create itemRepo bean to give access to JpaRepository methods (and custom methods if made)
     @Autowired
     ItemRepo itemRepo;
+
+    @Autowired
+    CommentRepo commentRepo;
 
     @GetMapping(value ="/")
     public String getHome(){
@@ -50,6 +56,16 @@ public class Routing {
         }else{
 //            Return HTTP code 404 (not found)
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(value = "/graveyard")
+    public ResponseEntity<List<Item>> getAllDeleted(){
+        try{
+            List<Item> deletedInventory = new ArrayList<Item>(itemRepo.findAllDeleted());
+            return new ResponseEntity<>(deletedInventory, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -96,7 +112,7 @@ public class Routing {
             _item.setItemName(item.getItemName());
             _item.setItemDescription(item.getItemDescription());
             _item.setQuantity(item.getQuantity());
-            _item.setLastUpdated(LocalDateTime.now());
+            _item.setLastUpdated(LocalDateTime.now().toString());
 
             return new ResponseEntity<>(itemRepo.save(_item), HttpStatus.OK);
         }else{
@@ -106,13 +122,15 @@ public class Routing {
 
 //    This safely deletes items.
     @DeleteMapping(value = "/inventory/{id}")
-    public String softDelete(@PathVariable long id){
+    public String softDelete(@PathVariable long id, @RequestBody Comment comment){
         Optional<Item> itemToDelete = itemRepo.findById(id);
 
         if(itemToDelete.isPresent()){
             Item _item = itemToDelete.get();
             _item.setEnabled(false);
             itemRepo.save(_item);
+
+            commentRepo.save(new Comment(comment.getCommentId(), comment.getComment(), comment.getEntryDate(), _item));
 
             return "/delete/DeleteSuccess.html";
         }else{

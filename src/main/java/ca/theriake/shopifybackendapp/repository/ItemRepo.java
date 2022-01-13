@@ -10,13 +10,16 @@ import java.util.Optional;
 public interface ItemRepo extends JpaRepository<Item, Long> {
 
     @Override
-    @Query("SELECT e FROM #{#entityName} e WHERE e.enabled=true")
+//    @Query("SELECT e FROM #{#entityName} e WHERE e.enabled=true")
+    @Query(value = "SELECT * FROM inventory i WHERE i.enabled = 1",
+            nativeQuery=true)
     List<Item> findAll();
+
 
     @Override
     @Query("SELECT e FROM #{#entityName} e WHERE e.enabled=true AND e.itemID = ?1")
     Optional<Item> findById(Long id);
 
     @Query("SELECT e FROM #{#entityName} e WHERE e.enabled=false")
-    List<Item> findDeleted();
+    List<Item> findAllDeleted();
 }
