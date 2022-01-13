@@ -1,5 +1,7 @@
 package ca.theriake.shopifybackendapp.models;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -15,6 +17,7 @@ import java.util.Set;
 @Setter
 @ToString
 @NoArgsConstructor
+@JsonFilter("filter")
 public class Item {
 
     public Item(Long itemID, String itemName, String itemDescription, int quantity, boolean enabled, String entryDate, String lastUpdated) {
@@ -50,6 +53,7 @@ public class Item {
     @Column(name = "last_updated", columnDefinition = "date default (datetime('now','localtime'))")
     private String lastUpdated = LocalDateTime.now().toString();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "item")
     @ToString.Exclude
     private Set<Comment> comments;

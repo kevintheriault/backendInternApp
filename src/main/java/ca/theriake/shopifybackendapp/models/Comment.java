@@ -1,5 +1,6 @@
 package ca.theriake.shopifybackendapp.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,11 @@ public class Comment {
     @Column(name = "entry_date", columnDefinition = "DATE DEFAULT (DATE('now'))")
     private String entryDate = LocalDateTime.now().toString();
 
-    @ManyToOne
+    @Column(name = "type", columnDefinition = "text")
+    private String type;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
     private Item item;
 }

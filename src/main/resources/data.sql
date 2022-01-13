@@ -1,2 +1,0 @@
-INSERT INTO INVENTORY (ITEM_NAME, ITEM_DESCRIPTION, QUANTITY, ENABLED)
-VALUES ('test', 'Description for test item', 22, 1);
