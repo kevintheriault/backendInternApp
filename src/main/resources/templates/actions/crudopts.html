@@ -12,8 +12,7 @@
             <li><a th:href= "@{/}">Home</a></li>
             <li><a th:href= "@{/inventory}">List All</a></li>
             <li><a th:href= "@{/crudopts}">CRUD Actions</a></li>
-            <li><a th:href= "@{/graveyard}">View Deleted Items</a></li>
-            <li><a th:href= "@{/pickundelete}">Undelete Item</a></li>
+            <li><a th:href= "@{/graveyard}">View the GRAVEYARD!</a></li>
         </ul>
     </nav>
 </header>
@@ -24,11 +23,11 @@
     <div>
         <form th:action="@{/inventory/get}" th:method="POST">
             <label for="view" name="option">View</label>
-            <input type="radio" id="view" name="requestType" value="view">
+            <input type="radio" id="view" name="requestType" value="view" checked>
             <label for="edit" name="option" >Edit</label>
             <input type="radio" id="edit" name="requestType" value="edit">
             <label for="delete" name="option" >Delete</label>
-            <input type="radio" id="delete" name="requestType" value="delete"><br><br>
+            <input type="radio" id="delete" name="requestType" value="delete">
             <label for="undelete" name="option" >Restore</label>
             <input type="radio" id="undelete" name="requestType" value="undelete"><br><br>
 
