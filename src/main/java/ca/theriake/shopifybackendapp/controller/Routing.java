@@ -219,10 +219,9 @@ public class Routing {
     }
 
 //    update existing entities
-    @PutMapping(value = "/edititem/")
-    public ResponseEntity<MappingJacksonValue> updateItem(@RequestParam Long itemID, @ModelAttribute Item item){
-        Optional<Item> itemToUpdate = itemRepo.findById(itemID);
-
+    @PutMapping(value = "/edititem/{id}")
+    public ResponseEntity<MappingJacksonValue> updateItem(@PathVariable Long id, @ModelAttribute Item item){
+        Optional<Item> itemToUpdate = itemRepo.findById(id);
 
         if(itemToUpdate.isPresent()){
             Item _item = itemToUpdate.get();
