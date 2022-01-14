@@ -22,4 +22,7 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
 
     @Query("SELECT e FROM #{#entityName} e WHERE e.enabled=false")
     List<Item> findAllDeleted();
+
+    @Query("SELECT e FROM #{#entityName} e")
+    Optional<Item> findByIdIgnoreFilter(Long id);
 }

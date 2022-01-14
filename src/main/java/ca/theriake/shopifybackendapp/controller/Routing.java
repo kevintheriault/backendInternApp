@@ -84,6 +84,9 @@ public class Routing {
             case "delete":
                 returnUrl += "deleteitem/" + id;
                 break;
+            case "undelete":
+                returnUrl += "delete/harddelete/" + id;
+                break;
             default:
                 returnUrl = "";
                 break;
@@ -269,12 +272,12 @@ public class Routing {
 //    Included to ensure all actual CRUD endpoints are still available.
     @DeleteMapping(value = "/delete/harddelete/{id}")
     public ResponseEntity<Object> hardDelete(@PathVariable Long id, Model model){
-        Optional<Item> itemToDelete = itemRepo.findByIdDeleted(id);
+        Optional<Item> itemToDelete = itemRepo.findByIdIgnoreFilter(id);
 
         if(itemToDelete.isPresent()){
             itemRepo.deleteById(id);
             model.addAttribute(id);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>("Permanently Deleted item:" + id, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
