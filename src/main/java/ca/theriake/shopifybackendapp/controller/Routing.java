@@ -46,12 +46,12 @@ public class Routing {
 
         model.addAttribute("item", item);
 
-        return "/actions/create.html";
+        return "actions/create.html";
     }
 
     @GetMapping(value = "/crudopts")
     public String getPickItem(){
-        return "/actions/crudopts.html";
+        return "actions/crudopts.html";
     }
 
     @GetMapping(value = "/edititem/{id}")
@@ -61,9 +61,9 @@ public class Routing {
         if(item.isPresent()){
             model.addAttribute("item", item.get());
         }else{
-            return "/";
+            return "";
         }
-        return "/actions/edititem.html";
+        return "actions/edititem.html";
     }
 
 //    Post-redirect-get implementation for CRUD actions.
@@ -98,9 +98,9 @@ public class Routing {
         if(item.isPresent()){
             model.addAttribute("item", item.get());
         }else{
-            return "/";
+            return "";
         }
-        return "/actions/deleteitem.html";
+        return "actions/deleteitem.html";
     }
 
 //    Get mapping for all items in inventory.  This returns a JSON response entity from a list.
