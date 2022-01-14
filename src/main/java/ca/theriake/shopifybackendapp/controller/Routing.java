@@ -85,7 +85,7 @@ public class Routing {
                 returnUrl += "deleteitem/" + id;
                 break;
             case "undelete":
-                returnUrl += "delete/harddelete/" + id;
+                returnUrl += "restore/" + id;
                 break;
             default:
                 returnUrl = "";
@@ -104,6 +104,18 @@ public class Routing {
             return "";
         }
         return "actions/deleteitem.html";
+    }
+
+    @GetMapping(value = "/restore/{id}")
+    public String confirmRestore(@PathVariable Long id, Model model){
+        Optional<Item> item = itemRepo.findByIdDeleted(id);
+
+        if(item.isPresent()){
+            model.addAttribute("item", item.get());
+        }else{
+            return "";
+        }
+        return "actions/undelete.html";
     }
 
 //    Get mapping for all items in inventory.  This returns a JSON response entity from a list.
@@ -240,13 +252,37 @@ public class Routing {
         }
     }
 
+    @PutMapping(value = "/restore")
+    public ResponseEntity<MappingJacksonValue> restoreItem(@RequestParam Long itemID, @RequestParam String comment){
+        Optional<Item> itemToUpdate = itemRepo.findByIdDeleted(itemID);
+
+        Comment _comment = new Comment();
+        _comment.setComment(comment);
+        _comment.setType("restore");
+
+        if(itemToUpdate.isPresent()){
+            Item _item = itemToUpdate.get();
+            _item.setEnabled(true);
+            _item.setLastUpdated(LocalDateTime.now().toString());
+            itemRepo.save(_item);
+
+            _comment.setItem(_item);
+            commentRepo.save(_comment);
+
+            MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(itemRepo.save(_item));
+            mappingJacksonValue.setFilters(defaultFilter);
+
+            return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
 //    This safely deletes items by just switching the item enabled attribute to false.  All queries filter on this attribute
 //    so it is essentially 'deleted' but retrievable.
     @DeleteMapping(value = "/deleteitem/")
     public ResponseEntity<Object> softDelete(@RequestParam Long itemID, @RequestParam String comment){
         Optional<Item> itemToDelete = itemRepo.findById(itemID);
-
-        System.out.println(comment);
 
         Comment _comment = new Comment();
         _comment.setComment(comment);
@@ -262,7 +298,7 @@ public class Routing {
 
             commentRepo.save(_comment);
 
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>("Item is now in the graveyard", HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }

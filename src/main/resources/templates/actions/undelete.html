@@ -21,7 +21,7 @@
     <h2>Undelete an Item</h2>
     <p>Please comment on why you are undeleting this item and confirm:</p>
     <div>
-        <form th:action="@{/delete/harddelete/}" method="post">
+        <form th:action="@{/restore/}" method="post">
             <input type="hidden" name="_method" value="put"/>
             <input type="hidden" name="itemID" th:field="${item.itemID}" th:value="${item.itemID}" />
 
