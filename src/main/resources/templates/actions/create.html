@@ -18,12 +18,10 @@
     </nav>
 </header>
 <main>
-    <h2>Edit an Item</h2>
-    <p>Use this form to edit:</p>
+    <h2>Create an Item</h2>
+    <p>Enter item details:</p>
     <div>
-        <form th:action="@{/edititem/}" method="post" th:object="${item}">
-            <input type="hidden" name="_method" value="put"/>
-            <input type="hidden" name="itemID" th:field=*{itemID} th:value="*{itemID}" />
+        <form th:action="@{/inventory}" method="post" th:object="${item}">
 
             <label for="name">Item Name:</label>
             <input id="name" type="text" th:field="*{itemName}"> <br><br>
@@ -34,7 +32,7 @@
             <label for="quantity">Quantity of Item:</label>
             <input id="quantity" type="text" th:field="*{quantity}"> <br> <br>
 
-            <button type="submit">Update this Item</button>
+            <button type="submit">Create this Item</button>
         </form>
     </div>
 </main>

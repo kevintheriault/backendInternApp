@@ -29,16 +29,29 @@ public class Routing {
     @Autowired
     CommentRepo commentRepo;
 
-//    MAPPING FOR FRONTEND ELEMENTS TO MAKE API MORE USER-FRIENDLY.  Had to assume that no technologies existed on
+//    Initializing private default filtering.  This is to hide deleted items and hide comments on regular queries.
+    private SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAllExcept("comments", "enabled");
+    private FilterProvider defaultFilter = new SimpleFilterProvider().addFilter("filter", s);
+
+    //    MAPPING FOR FRONTEND ELEMENTS TO MAKE API MORE USER-FRIENDLY.  Had to assume that no technologies existed on
 //    Reviewers environment to allow interacting with API (ie postman).
     @GetMapping(value = "/")
     public String getHome(){
         return "/index.html";
     }
 
-    @GetMapping(value = "/pickitem")
+    @GetMapping(value = "/createitem")
+    public String getCreateItem(Model model){
+        Item item = new Item();
+
+        model.addAttribute("item", item);
+
+        return "/actions/create.html";
+    }
+
+    @GetMapping(value = "/crudopts")
     public String getPickItem(){
-        return "/actions/pickitem.html";
+        return "/actions/crudopts.html";
     }
 
     @GetMapping(value = "/edititem/{id}")
@@ -94,14 +107,10 @@ public class Routing {
     @GetMapping(value = "/inventory")
     public ResponseEntity<MappingJacksonValue> getAllInventory() {
         try{
-            SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAllExcept("comments");
-
-            FilterProvider filter = new SimpleFilterProvider().addFilter("filter", s);
-
             List<Item> inventory = itemRepo.findAll();
 
             MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(inventory);
-            mappingJacksonValue.setFilters(filter);
+            mappingJacksonValue.setFilters(defaultFilter);
 
             return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
         }catch (Exception e){
@@ -113,9 +122,6 @@ public class Routing {
 //    Get mapping for a specific inventory item by that items ID.
     @GetMapping(value = "/inventory/{id}")
     public ResponseEntity<MappingJacksonValue> getItemByID(@PathVariable("id") long id){
-        SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAllExcept("comments");
-
-        FilterProvider filter = new SimpleFilterProvider().addFilter("filter", s);
 
 //        Allows you to use .isPresent method and works with ResponseEntity.
         Optional<Item> item = itemRepo.findById(id);
@@ -123,7 +129,7 @@ public class Routing {
         if(item.isPresent()) {
 //            Return entity with the item.
             MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(item.get());
-            mappingJacksonValue.setFilters(filter);
+            mappingJacksonValue.setFilters(defaultFilter);
             return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
         }else{
 //            Return HTTP code 404 (not found)
@@ -134,13 +140,13 @@ public class Routing {
     @GetMapping(value = "/graveyard")
     public ResponseEntity<MappingJacksonValue> getAllDeleted(){
         try{
-            SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAllExcept();
-            FilterProvider filter = new SimpleFilterProvider().addFilter("filter", s);
+            SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAll();
+            FilterProvider includeAllFilter = new SimpleFilterProvider().addFilter("filter", s);
 
             List<Item> deletedInventory = itemRepo.findAllDeleted();
 
             MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(deletedInventory);
-            mappingJacksonValue.setFilters(filter);
+            mappingJacksonValue.setFilters(includeAllFilter);
 
             return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
         }catch (Exception e){
@@ -152,8 +158,7 @@ public class Routing {
     public ResponseEntity<MappingJacksonValue> undeleteItem(@PathVariable Long id, @RequestBody Comment comment){
         Optional<Item> itemToUndelete = itemRepo.findByIdDeleted(id);
         SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAll();
-
-        FilterProvider filter = new SimpleFilterProvider().addFilter("filter", s);
+        FilterProvider includeAllFilter = new SimpleFilterProvider().addFilter("filter", s);
 
         if(itemToUndelete.isPresent()){
             Item _item = itemToUndelete.get();
@@ -166,7 +171,7 @@ public class Routing {
                             comment.getEntryDate(), comment.getType(), _item));
 
             MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(itemRepo.findById(id));
-            mappingJacksonValue.setFilters(filter);
+            mappingJacksonValue.setFilters(includeAllFilter);
 
             return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
         }else{
@@ -176,7 +181,7 @@ public class Routing {
 
 //    Create new entries with post.
     @PostMapping(value = "/inventory")
-    public ResponseEntity<Item> postItem(@RequestBody Item item){
+    public ResponseEntity<MappingJacksonValue> postItem(@ModelAttribute Item item){
 
 //        Added items are 'enabled' by default because they cannot be soft-deleted by definition once added.
         try {
@@ -184,7 +189,10 @@ public class Routing {
                     .save(new Item(item.getItemID(), item.getItemName(), item.getItemDescription(), item.getQuantity(),
                             true, item.getEntryDate(), item.getLastUpdated()));
 
-            return new ResponseEntity<>(_item, HttpStatus.CREATED);
+            MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(itemRepo.findById(_item.getItemID()));
+            mappingJacksonValue.setFilters(defaultFilter);
+
+            return new ResponseEntity<>(mappingJacksonValue, HttpStatus.CREATED);
         } catch (Exception e) {
 
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -211,8 +219,7 @@ public class Routing {
     @PutMapping(value = "/edititem/")
     public ResponseEntity<MappingJacksonValue> updateItem(@RequestParam Long itemID, @ModelAttribute Item item){
         Optional<Item> itemToUpdate = itemRepo.findById(itemID);
-        SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAllExcept("comments");
-        FilterProvider filter = new SimpleFilterProvider().addFilter("filter", s);
+
 
         if(itemToUpdate.isPresent()){
             Item _item = itemToUpdate.get();
@@ -222,7 +229,7 @@ public class Routing {
             _item.setLastUpdated(LocalDateTime.now().toString());
 
             MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(itemRepo.save(_item));
-            mappingJacksonValue.setFilters(filter);
+            mappingJacksonValue.setFilters(defaultFilter);
 
             return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
         }else{
@@ -258,10 +265,11 @@ public class Routing {
         }
     }
 
-//    This routing is to actually delete items from the database.
+//    This routing is to actually delete items from the database.  Items deleted with this end-point are not recoverable.
+//    Included to ensure all actual CRUD endpoints are still available.
     @DeleteMapping(value = "/delete/harddelete/{id}")
-    public ResponseEntity<Object> hardDelete(@PathVariable long id, Model model){
-        Optional<Item> itemToDelete = itemRepo.findById(id);
+    public ResponseEntity<Object> hardDelete(@PathVariable Long id, Model model){
+        Optional<Item> itemToDelete = itemRepo.findByIdDeleted(id);
 
         if(itemToDelete.isPresent()){
             itemRepo.deleteById(id);
@@ -271,5 +279,4 @@ public class Routing {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
-
 }

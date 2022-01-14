@@ -11,14 +11,15 @@
         <ul>
             <li><a th:href= "@{/}">Home</a></li>
             <li><a th:href= "@{/inventory}">List All</a></li>
-            <li><a th:href= "@{/pickitem}">CRUD Actions</a></li>
+            <li><a th:href= "@{/crudopts}">CRUD Actions</a></li>
             <li><a th:href= "@{/graveyard}">View Deleted Items</a></li>
             <li><a th:href= "@{/pickundelete}">Undelete Item</a></li>
         </ul>
     </nav>
 </header>
 <main>
-    <h2>Pick an Item</h2>
+    <h2>CRUD OPTIONS</h2>
+    <p>Click <a th:href="@{/createitem}">HERE</a> to create an item!</p>
     <p>Use this form to pick an item to view/edit/delete:</p>
     <div>
         <form th:action="@{/inventory/get}" th:method="POST">
