@@ -9,6 +9,8 @@ The application is fully functional there for all CRUD options.
 Handles deletion with comments and undeletion with comments.  
 Comments only show when viewing the 'graveyard' (ie. all deleted items.)
 
+Alternatively you can build this using mvn package and have an executable .jar file which will contain all required files include Tomcat servlet allowing the application to run. I didn't include this because you would still require local JAVA runtime and SQLite drivers for it to work and the challenge said to 'not assume any technology exist in environment' So I chose to deploy to Heroku so you can see code here and view deployed project there.
+
 ## Tech Stack
 - JAVA
 - Spring Boot with JPA using Hibernate
@@ -17,6 +19,16 @@ Comments only show when viewing the 'graveyard' (ie. all deleted items.)
 - Thymeleaf
 - Jackson (JSON Handling + Filtering)
 - Deploy on Heroku using autodeploy.
+
+## Explanation of stack choices
+
+I chose to use Java with Spring boot because the challenge requested ensuring that the app could scale.  This gives very easy scalability only requiring entities be added.  The database is updated with new entities automatically.
+
+SQLite was chosen just because it's lightweight and this is a tiny project.  However could easily be changed to any other required database.  application.properties would just be changed to handle the connection.
+
+I like using Lombok just for clean code.
+
+I'm using Jackson (which is included in Spring Boot) to handle JSON response entities.  I didn't want comments showing for all items so used this to filter them out.  The default filter I created filters out "comments" and "enabled".  In graveyard I have no filters running so comments and enabled status is shown.
 
 ## Required Features:
 - Create inventory items
