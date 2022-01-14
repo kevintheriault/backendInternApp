@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-@RestController
+@Controller
 public class Routing {
 //    Create itemRepo bean to give access to JpaRepository methods (and custom methods if made)
     @Autowired
@@ -27,6 +28,67 @@ public class Routing {
 
     @Autowired
     CommentRepo commentRepo;
+
+//    MAPPING FOR FRONTEND ELEMENTS TO MAKE API MORE USER-FRIENDLY.  Had to assume that no technologies existed on
+//    Reviewers environment to allow interacting with API (ie postman).
+    @GetMapping(value = "/")
+    public String getHome(){
+        return "/index.html";
+    }
+
+    @GetMapping(value = "/pickitem")
+    public String getPickItem(){
+        return "/actions/pickitem.html";
+    }
+
+    @GetMapping(value = "/edititem/{id}")
+    public String pickItemEdit(@PathVariable Long id, Model model){
+        Optional<Item> item = itemRepo.findById(id);
+
+        if(item.isPresent()){
+            model.addAttribute("item", item.get());
+        }else{
+            return "/";
+        }
+        return "/actions/edititem.html";
+    }
+
+//    Post-redirect-get implementation for CRUD actions.
+    @PostMapping(value = "/inventory/get")
+    public String redirectGetItem(@RequestParam String id, @RequestParam String requestType){
+        String returnUrl = "/";
+
+        switch(requestType) {
+            case "create":
+                returnUrl += "inventory/create";
+                break;
+            case "view":
+                returnUrl += "inventory/" +id;
+                break;
+            case "edit":
+                returnUrl += "edititem/" +id;
+                break;
+            case "delete":
+                returnUrl += "deleteitem/" + id;
+                break;
+            default:
+                returnUrl = "";
+                break;
+        }
+        return "redirect:" + returnUrl;
+    }
+
+    @GetMapping(value = "/deleteitem/{id}")
+    public String confirmDelete(@PathVariable Long id, Model model){
+        Optional<Item> item = itemRepo.findById(id);
+
+        if(item.isPresent()){
+            model.addAttribute("item", item.get());
+        }else{
+            return "/";
+        }
+        return "/actions/deleteitem.html";
+    }
 
 //    Get mapping for all items in inventory.  This returns a JSON response entity from a list.
     @GetMapping(value = "/inventory")
@@ -58,11 +120,10 @@ public class Routing {
 //        Allows you to use .isPresent method and works with ResponseEntity.
         Optional<Item> item = itemRepo.findById(id);
 
-        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(item.get());
-        mappingJacksonValue.setFilters(filter);
-
         if(item.isPresent()) {
 //            Return entity with the item.
+            MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(item.get());
+            mappingJacksonValue.setFilters(filter);
             return new ResponseEntity<>(mappingJacksonValue, HttpStatus.OK);
         }else{
 //            Return HTTP code 404 (not found)
@@ -147,9 +208,9 @@ public class Routing {
     }
 
 //    update existing entities
-    @PutMapping(value = "/inventory/{id}")
-    public ResponseEntity<MappingJacksonValue> updateItem(@PathVariable long id, @RequestBody Item item){
-        Optional<Item> itemToUpdate = itemRepo.findById(id);
+    @PutMapping(value = "/edititem/")
+    public ResponseEntity<MappingJacksonValue> updateItem(@RequestParam Long itemID, @ModelAttribute Item item){
+        Optional<Item> itemToUpdate = itemRepo.findById(itemID);
         SimpleBeanPropertyFilter s = SimpleBeanPropertyFilter.serializeAllExcept("comments");
         FilterProvider filter = new SimpleFilterProvider().addFilter("filter", s);
 
@@ -169,19 +230,27 @@ public class Routing {
         }
     }
 
-//    This safely deletes items.
-    @DeleteMapping(value = "/inventory/{id}")
-    public ResponseEntity<Object> softDelete(@PathVariable long id, @RequestBody Comment comment){
-        Optional<Item> itemToDelete = itemRepo.findById(id);
+//    This safely deletes items by just switching the item enabled attribute to false.  All queries filter on this attribute
+//    so it is essentially 'deleted' but retrievable.
+    @DeleteMapping(value = "/deleteitem/")
+    public ResponseEntity<Object> softDelete(@RequestParam Long itemID, @RequestParam String comment){
+        Optional<Item> itemToDelete = itemRepo.findById(itemID);
+
+        System.out.println(comment);
+
+        Comment _comment = new Comment();
+        _comment.setComment(comment);
+        _comment.setType("deletion");
 
         if(itemToDelete.isPresent()){
             Item _item = itemToDelete.get();
             _item.setEnabled(false);
+            _item.setLastUpdated(LocalDateTime.now().toString());
             itemRepo.save(_item);
 
-            comment.setType("deletion");
-            commentRepo.save(new Comment(comment.getCommentId(), comment.getComment(),
-                            comment.getEntryDate(), comment.getType(), _item));
+            _comment.setItem(_item);
+
+            commentRepo.save(_comment);
 
             return new ResponseEntity<>(null, HttpStatus.OK);
         }else{
