@@ -10,9 +10,9 @@ Handles deletion with comments and undeletion with comments.
 Comments only show when viewing the 'graveyard' (ie. all deleted items.)
 
 ## Tech Stack
-JAVA
-Spring Boot with JPA using Hibernate
-Lombok
-SQLite
-Thymeleaf
-Jackson (JSON Handling + Filtering)
+-JAVA
+-Spring Boot with JPA using Hibernate
+-Lombok
+-SQLite
+-Thymeleaf
+-Jackson (JSON Handling + Filtering)
