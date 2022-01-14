@@ -2,7 +2,7 @@
 
 For the Shopify Backend Internship Challenge 2022.
 
-##How to use?
+## How to use?
 
 All routing right now is done using ResponseEntities.  Going to add simple thymeleaf html files to have simple frontend UI.
 
