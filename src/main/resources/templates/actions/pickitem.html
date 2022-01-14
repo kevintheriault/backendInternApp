@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Logistics API</title>
+</head>
+<body>
+<header>
+    <h1>Logistics API</h1>
+    <nav>
+        <ul>
+            <li><a th:href= "@{/}">Home</a></li>
+            <li><a th:href= "@{/inventory}">List All</a></li>
+            <li><a th:href= "@{/pickitem}">CRUD Actions</a></li>
+            <li><a th:href= "@{/graveyard}">View Deleted Items</a></li>
+            <li><a th:href= "@{/pickundelete}">Undelete Item</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h2>Pick an Item</h2>
+    <p>Use this form to pick an item to view/edit/delete:</p>
+    <div>
+        <form th:action="@{/inventory/get}" th:method="POST">
+            <label for="view" name="option">View</label>
+            <input type="radio" id="view" name="requestType" value="view">
+            <label for="edit" name="option" >Edit</label>
+            <input type="radio" id="edit" name="requestType" value="edit">
+            <label for="edit" name="option" >Delete</label>
+            <input type="radio" id="delete" name="requestType" value="delete"><br><br>
+
+            <label for="id">Enter an item id:</label>
+            <input type="text" name="id" id="id">
+            <button type="submit">Get Item Data</button>
+        </form>
+        <p style="color: red">If the item does not exist you will get a 404 not found error.</p>
+    </div>
+</main>
+</body>
+</html>

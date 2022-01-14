@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Logistics API</title>
+</head>
+<body>
+<header>
+    <h1>Logistics API</h1>
+    <nav>
+        <ul>
+            <li><a th:href= "@{/}">Home</a></li>
+            <li><a th:href= "@{/inventory}">List All</a></li>
+            <li><a th:href= "@{/pickitem}">CRUD Actions</a></li>
+            <li><a th:href= "@{/graveyard}">View Deleted Items</a></li>
+            <li><a th:href= "@{/pickundelete}">Undelete Item</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h2>HOME</h2>
+    <p>You can utilize the links above to use the API.  Deleted items are by deleted using a safe-delete
+        method which allows them to be retrievable still.  Items can be hard-deleted using delete method on path:
+        '/delete/harddelete/{id}'  Items deleted with this method will not be retrievable after deletion which is why
+        I have hidden it.</p>
+</main>
+</body>
+</html>

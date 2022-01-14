@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Logistics API</title>
+</head>
+<body>
+<header>
+    <h1>Logistics API</h1>
+    <nav>
+        <ul>
+            <li><a th:href= "@{/}">Home</a></li>
+            <li><a th:href= "@{/inventory}">List All</a></li>
+            <li><a th:href= "@{/pickitem}">CRUD Actions</a></li>
+            <li><a th:href= "@{/graveyard}">View Deleted Items</a></li>
+            <li><a th:href= "@{/pickundelete}">Undelete Item</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h2>Edit an Item</h2>
+    <p>Use this form to edit:</p>
+    <div>
+        <form th:action="@{/edititem/}" method="post" th:object="${item}">
+            <input type="hidden" name="_method" value="put"/>
+            <input type="hidden" name="itemID" th:field=*{itemID} th:value="*{itemID}" />
+
+            <label for="name">Item Name:</label>
+            <input id="name" type="text" th:field="*{itemName}"> <br><br>
+
+            <label for="description">Item Description:</label>
+            <textarea id="description" rows="10" cols="50" th:field="*{itemDescription}"></textarea> <br><br>
+
+            <label for="quantity">Quantity of Item:</label>
+            <input id="quantity" type="text" th:field="*{quantity}"> <br> <br>
+
+            <button type="submit">Update this Item</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>
