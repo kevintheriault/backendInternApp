@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Logistics API</title>
 </head>
 <body>
+<header>
+    <h1>Logistics API</h1>
+    <nav>
+        <ul>
+            <li><a th:href= "@{/}">Home</a></li>
+            <li><a th:href= "@{/inventory}">List All</a></li>
+            <li><a th:href= "@{/crudopts}">CRUD Actions</a></li>
+            <li><a th:href= "@{/graveyard}">View Deleted Items</a></li>
+            <li><a th:href= "@{/pickundelete}">Undelete Item</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h2>Undelete an Item</h2>
+    <p>Please comment on why you are undeleting this item and confirm:</p>
+    <div>
+        <form th:action="@{/deleteitem/}" method="post">
+            <input type="hidden" name="_method" value="put"/>
+            <input type="hidden" name="itemID" th:field="${item.itemID}" th:value="${item.itemID}" />
 
+            <label for="comment">Comments:</label>
+            <textarea id="comment" rows="10" cols="50" required th:name="comment"></textarea> <br><br>
+
+            <button type="submit">Restore this Item</button>
+        </form>
+    </div>
+</main>
 </body>
 </html>
