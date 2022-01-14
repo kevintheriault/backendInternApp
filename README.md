@@ -1,6 +1,8 @@
-# backendInternApp
+# Shopify Logistics Backend
 
-This is a simple CRUD application create in Java with Spring Boot and JPA.
+For the Shopify Backend Internship Challenge 2022.
+
+##How to use?
 
 All routing right now is done using ResponseEntities.  Going to add simple thymeleaf html files to have simple frontend UI.
 
