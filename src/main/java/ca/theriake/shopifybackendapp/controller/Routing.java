@@ -37,7 +37,7 @@ public class Routing {
 //    Reviewers environment to allow interacting with API (ie postman).
     @GetMapping(value = "/")
     public String getHome(){
-        return "/index.html";
+        return "index.html";
     }
 
     @GetMapping(value = "/createitem")
