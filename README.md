@@ -22,7 +22,7 @@ Alternatively you can build this using mvn package and have an executable .jar f
 
 ## Explanation of stack choices
 
-I chose to use Java with Spring boot because the challenge requested ensuring that the app could scale.  This gives very easy scalability only requiring entities be added.  The database is updated with new entities automatically.
+I chose to use Java with Spring boot because the challenge requested ensuring that the app could scale.  This gives very easy scalability only requiring entities be added.  And authorization/security can be easily added either custom written or easily via any popular auth provider using Spring security.  The database is updated with new entities automatically.
 
 SQLite was chosen just because it's lightweight and this is a tiny project.  However could easily be changed to any other required database.  application.properties would just be changed to handle the connection.
 
