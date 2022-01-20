@@ -4,6 +4,7 @@ For the Shopify Backend Internship Challenge 2022.
 
 ## How to use?
 **Head over to: [My Heroku Deployment](https://theriake-shopify-backend-chall.herokuapp.com/)**
+--- On first load it may take awhile due to being served on Heroku and getting low traffic.  Shouldn't take more than 20s if server was sleeping ---
 
 The application is fully functional there for all CRUD options.
 Handles deletion with comments and undeletion with comments.  
